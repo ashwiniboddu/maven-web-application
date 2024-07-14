@@ -1,0 +1,33 @@
+pipeline{
+
+agent any
+
+tools{
+maven 'maven'
+
+}
+
+stages{
+
+  stage('CheckOutCode'){
+    steps{
+    git branch: 'dev', credentialsId: 'git_cred', url: 'https://github.com/ashwiniboddu/maven-web-application.git'
+	
+	}
+  }
+  
+
+stage('Build'){
+  steps{
+  sh  "mvn clean package"
+  }
+  }
+stage('DeployAppIntoTomcat'){
+  steps{
+    sshagent(['tomcat']) {
+    sh "scp -o StrictHostKeyChecking=no target/maven-web-application.war ubuntu@13.232.68.70:/opt/tomcat/webapp"
+}
+  }
+}
+}
+}
